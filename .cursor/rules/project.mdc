@@ -1,0 +1,75 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+refer to [technical_specs.md](mdc:technical_specs.md) if needed
+
+# Rule Content (Markdown)
+
+## Travel Tracker App - Backend Development Guidelines (Python/Django)
+
+**1. Language & Framework:**
+* **Language:** Python 3.x (latest stable recommended).
+* **Framework:** Django (latest stable).
+* **API:** Django REST Framework (DRF).
+    * Utilize DRF ViewSets, Serializers, and Routers.
+    * Strictly follow RESTful principles for API design.
+
+**2. Database:**
+* **Type:** PostgreSQL.
+* **Interaction:** Use the Django ORM exclusively for all database operations. Define clear models in `models.py`.
+
+**3. Architecture:**
+* **Style:** Modular Django Apps.
+* **Examples:** Create separate apps for distinct concerns (e.g., `users`, `travel`, `visa_rules`). Ensure clear separation of responsibilities.
+
+**4. Authentication:**
+* **Method:** JSON Web Tokens (JWT).
+* **Library:** `djangorestframework-simplejwt`.
+* **Strategy:** Implement Access Tokens (short-lived) and Refresh Tokens (long-lived).
+* **Sign in with Apple:** Handle server-side validation of Apple identity tokens using `python-jose` or a similar library capable of JWT validation with JWKS.
+
+**5. Asynchronous Tasks:**
+* **Framework:** RQ (Redis Queue).
+* **Integration:** Use `django-rq` or implement direct `rq` integration.
+* **Use Case:** Primarily for processing CSV imports asynchronously.
+* **API Flow:**
+    * The initial API request for import should enqueue the task and immediately return a `task_id`.
+    * Provide a separate status endpoint (e.g., `/api/travel-segments/import/status/{task_id}/`) for the client to poll the task status (pending, started, success, failure).
+
+**6. Key Libraries:**
+* `django`
+* `djangorestframework`
+* `djangorestframework-simplejwt`
+* `django-rq` / `rq`
+* `redis` (for RQ broker)
+* `psycopg2-binary` / `psycopg` (PostgreSQL driver)
+* `pyairports` (or a similar, reliable library for mapping IATA airport codes to countries)
+* `python-jose` (or similar for Apple JWT validation)
+* *(Potential)* `django-push-notifications` or similar if push notifications are required.
+
+**7. Core Logic Implementation:**
+* **Visa Rules Engine:**
+    * Implement the Schengen 90/180 day rule as the primary calculation.
+    * Design the calculation logic to be extensible for future rule types.
+    * Cache calculated visa status results persistently, potentially in a dedicated `UserVisaStatus` model linked to the user, to avoid recalculation on every request. Update cache upon changes to travel segments.
+* **CSV Import (Async Task):**
+    * Parse the uploaded CSV file within the RQ task.
+    * Map airport IATA codes to countries using the chosen library (`pyairports` etc.). Handle potential mapping errors gracefully.
+    * Correctly identify and handle layovers, especially those crossing midnight, when creating `TravelSegment` objects.
+    * Create `TravelSegment` model instances in the database.
+* **Day Counting Convention:** Remember that for visa limit calculations (like Schengen), both the arrival day and the departure day count towards the total days spent.
+* **Data Synchronization / Conflict Resolution:** Use `updated_at` timestamps on relevant models. Implement a "Last Write Wins" strategy via the API for handling potential concurrent updates if necessary.
+
+**8. Deployment:**
+* **Method:** Docker containers.
+* **Target Platforms:** Prepare for deployment to Azure, Heroku, Render, or similar container hosting platforms.
+* **Requirements:** Ensure a well-defined `Dockerfile`, `requirements.txt` (or `Pipfile`/`pyproject.toml`), and clear handling of environment variables for configuration (database URL, secret keys, API keys, etc.).
+
+**9. Focus Files:**
+* Prioritize clarity and correctness in standard Django files within each app: `models.py`, `serializers.py`, `views.py`, `urls.py`.
+* Implement asynchronous logic in `tasks.py` files (for RQ).
+* Manage project-wide configurations in `settings.py`.
+
