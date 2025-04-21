@@ -21,12 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-zde&m86f9bio*ukeqna)==)5uc@l+2pba98t#95@fin5gr@lpi")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-zde&m86f9bio*ukeqna)==)5uc@l+2pba98t#95@fin5gr@lpi"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",") if os.environ.get("ALLOWED_HOSTS") else []
+ALLOWED_HOSTS = (
+    os.environ.get("ALLOWED_HOSTS", "").split(",")
+    if os.environ.get("ALLOWED_HOSTS")
+    else []
+)
 
 
 # Application definition
@@ -135,24 +141,24 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # REST Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
-    'DEFAULT_PERMISSION_CLASSES': [],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_PERMISSION_CLASSES": [],
 }
 
 # DRF Spectacular settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Travel Tracker API',
-    'DESCRIPTION': 'API for tracking travel and visa compliance',
-    'VERSION': '1.0.0',
+    "TITLE": "Travel Tracker API",
+    "DESCRIPTION": "API for tracking travel and visa compliance",
+    "VERSION": "1.0.0",
 }
 
 # Django RQ configuration
 RQ_QUEUES = {
-    'default': {
-        'HOST': os.environ.get('REDIS_HOST', 'redis'),
-        'PORT': os.environ.get('REDIS_PORT', 6379),
-        'DB': os.environ.get('REDIS_DB', 0),
-        'DEFAULT_TIMEOUT': 360,
+    "default": {
+        "HOST": os.environ.get("REDIS_HOST", "redis"),
+        "PORT": os.environ.get("REDIS_PORT", 6379),
+        "DB": os.environ.get("REDIS_DB", 0),
+        "DEFAULT_TIMEOUT": 360,
     }
 }

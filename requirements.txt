@@ -4,10 +4,10 @@ psycopg2-binary==2.9.10
 python-jose==3.3.0
 django-rq==2.9.0
 redis==5.0.2
-pyairports==1.0.0
+pyairports==2.1.1
 drf-spectacular==0.27.1
 gunicorn==21.2.0
 
 # Development dependencies
 flake8==7.0.0
-black==24.5.0 
+black==24.10.0 
